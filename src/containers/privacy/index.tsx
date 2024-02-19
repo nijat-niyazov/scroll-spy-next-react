@@ -26,46 +26,79 @@ const headersWithContent = [
     header: "Support",
     content: "All components were tested using the most popular email clients.",
   },
+  {
+    header: "Whehere",
+    content:
+      "We believe that email is an extremely important medium for people to communicate. However, we need to stop developing emails like 2010, and rethink how email can be done in 2024 and beyond. Email development needs a revamp. A renovation. Modernized for the way we build web apps today.",
+  },
+  {
+    header: "Get Started",
+    content: "React Email is designed to be incrementally adopted, so you can add it to most codebases in a few minutes.",
+  },
+  {
+    header: "Comps",
+    content:
+      "This is a set of standard components to help you build amazing emails without having to deal with the mess of creating table-based layouts and maintaining archaic markup.",
+  },
+  {
+    header: "Integrs",
+    content:
+      "In order to use React Email with any email service provider, you’ll need to convert the components made with React into a HTML string. This is done using the render utility.",
+  },
+  {
+    header: "Report",
+    content: "All components were tested using the most popular email clients.",
+  },
 ];
 
 const PrivacyContainer = () => {
-  const [activeSection, setActiveSection] = useState<number>(0);
+  const [activeSection, setActiveSection] = useState<number>(Number(localStorage.getItem("activeSection")) || 0);
 
   useEffect(() => {
     const nav = listRef.current as HTMLUListElement;
     const contents = Array.from(nav.children) as HTMLLIElement[];
 
-    /* -------------------------- Positions of contents ------------------------- */
-    let positions: number[] = [];
+    /* ---------------------- Middle Positions of contents ---------------------- */
+    let middlePosesOfContents: number[] = [];
     contents.forEach((section: HTMLLIElement) => {
-      const sectionTop = section.offsetTop;
-      const sectionHeight = section.clientHeight;
-      positions.push(sectionTop + sectionHeight);
+      const { offsetTop, offsetHeight } = section;
+
+      middlePosesOfContents.push(offsetTop + offsetHeight / 2);
     });
 
     /* --------------------------- window scroll event -------------------------- */
     function handleScroll() {
       const scrollPosition = window.scrollY;
 
-      if (scrollPosition < positions[0]) setActiveSection(0);
-      else if (scrollPosition > positions[0] && scrollPosition < positions[1]) setActiveSection(1);
-      else if (scrollPosition > positions[1] && scrollPosition < positions[2]) setActiveSection(2);
-      else if (scrollPosition > positions[2] && scrollPosition < positions[3]) setActiveSection(3);
-      else if (scrollPosition > positions[3]) setActiveSection(4);
+      for (let i = 0; i < middlePosesOfContents.length - 1; i++) {
+        if (scrollPosition < middlePosesOfContents[0]) {
+          setActiveSection(0);
+          break;
+        } else if (scrollPosition > middlePosesOfContents[i] && scrollPosition < middlePosesOfContents[i + 1]) {
+          setActiveSection(i + 1);
+          break;
+        }
+      }
     }
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    sessionStorage.setItem("activeSection", activeSection.toString());
+    return () => sessionStorage.removeItem("activeSection");
+  }, [activeSection]);
+
   const listRef = useRef<HTMLUListElement>(null);
 
   return (
-    <div className="flex items-start justify-end gap-24 p-10 mx-20 pb-96">
+    <div className="flex items-start justify-end gap-24 p-10 mx-20 pb-[700px]">
       <ul ref={listRef} className=" grid gap-40 place-self-end w-[60%] ">
         {headersWithContent.map(({ header, content }, i) => (
-          <li key={i}>
-            <h3 className="font-bold mb-10 text-4xl">{header}</h3>
-            <article className="text-xl">{content.repeat(3)}</article>
+          <li key={i} className="border-t-8 border-black">
+            <h3 className="font-bold mb-10 text-4xl select-none">{header}</h3>
+            <article className="text-xl select-none">{content.repeat(3)}</article>
           </li>
         ))}
       </ul>
