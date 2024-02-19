@@ -90,7 +90,7 @@ const PrivacyContainer = () => {
     return () => sessionStorage.removeItem("activeSection");
   }, [activeSection]);
 
-  const listRef = useRef<HTMLUListElement>(null);
+  const listRef = useRef<HTMLUListElement | null>(null);
 
   return (
     <div className="flex items-start justify-end gap-24 p-10 mx-20 pb-[700px]">
