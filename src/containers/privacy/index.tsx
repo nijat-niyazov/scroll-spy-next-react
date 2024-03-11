@@ -52,30 +52,32 @@ const headersWithContent = [
 ];
 
 const PrivacyContainer = () => {
-  const [activeSection, setActiveSection] = useState<number>(Number(localStorage.getItem("activeSection")) || 0);
+  const [activeSection, setActiveSection] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    else {
+      parseInt(sessionStorage.getItem("activeSection") ?? "0");
+    }
+  });
 
   useEffect(() => {
-    const nav = listRef.current as HTMLUListElement;
-    const contents = Array.from(nav.children) as HTMLLIElement[];
+    const contents = listRef.current?.querySelectorAll("li") as NodeListOf<HTMLLIElement>;
 
     /* ---------------------- Middle Positions of contents ---------------------- */
-    let middlePosesOfContents: number[] = [];
+    let positions: number[] = [];
     contents.forEach((section: HTMLLIElement) => {
       const { offsetTop, offsetHeight } = section;
 
-      middlePosesOfContents.push(offsetTop + offsetHeight / 2);
+      positions.push(offsetTop + offsetHeight - 20);
     });
 
     /* --------------------------- window scroll event -------------------------- */
     function handleScroll() {
       const scrollPosition = window.scrollY;
 
-      for (let i = 0; i < middlePosesOfContents.length - 1; i++) {
-        if (scrollPosition < middlePosesOfContents[0]) {
-          setActiveSection(0);
-          break;
-        } else if (scrollPosition > middlePosesOfContents[i] && scrollPosition < middlePosesOfContents[i + 1]) {
-          setActiveSection(i + 1);
+      for (let i = 0; i < positions.length; i++) {
+        if (scrollPosition < positions[i]) {
+          setActiveSection(i);
+          sessionStorage.setItem("activeSection", `${i}`);
           break;
         }
       }
@@ -85,18 +87,13 @@ const PrivacyContainer = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    sessionStorage.setItem("activeSection", activeSection.toString());
-    return () => sessionStorage.removeItem("activeSection");
-  }, [activeSection]);
-
-  const listRef = useRef<HTMLUListElement | null>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   return (
     <div className="flex items-start justify-end gap-24 p-10 mx-20 pb-[700px]">
       <ul ref={listRef} className=" grid gap-40 place-self-end w-[60%] ">
         {headersWithContent.map(({ header, content }, i) => (
-          <li key={i} className="border-t-8 border-black">
+          <li key={i} className="bg-amber-300">
             <h3 className="font-bold mb-10 text-4xl select-none">{header}</h3>
             <article className="text-xl select-none">{content.repeat(3)}</article>
           </li>
