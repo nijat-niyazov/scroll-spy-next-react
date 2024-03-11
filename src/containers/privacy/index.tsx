@@ -93,7 +93,7 @@ const PrivacyContainer = () => {
     <div className="flex items-start justify-end gap-24 p-10 mx-20 pb-[700px]">
       <ul ref={listRef} className=" grid gap-40 place-self-end w-[60%] ">
         {headersWithContent.map(({ header, content }, i) => (
-          <li key={i} className="bg-amber-300">
+          <li key={i} className="bg-amber-800">
             <h3 className="font-bold mb-10 text-4xl select-none">{header}</h3>
             <article className="text-xl select-none">{content.repeat(3)}</article>
           </li>
